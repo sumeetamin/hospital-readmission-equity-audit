@@ -1,38 +1,37 @@
 # Hospital Readmission Equity Audit
 
-A research-only readmission baseline with subgroup error-rate reporting and explicit clinical-use safeguards.
+A research-only benchmark for the historical UCI Diabetes 130-US Hospitals dataset. It predicts the dataset's **encounter-level `<30` readmission label** from encounter fields, and reports race/gender subgroup errors for audit. This is not a current clinical model, care-priority tool, or individual risk estimate.
 
-> **Portfolio prototype.** Code is provided; no benchmark results are claimed until you run it on the cited data and record the output.
+## Data and run
 
-## Use case
-
-A research-only readmission baseline with subgroup error-rate reporting and explicit clinical-use safeguards. The command below reads a local data export, applies a transparent baseline, writes holdout or decision-support outputs, and saves the fitted model where applicable.
-
-## Data and provenance
-
-[UCI Diabetes 130-US Hospitals for Years 1999-2008](https://archive.ics.uci.edu/dataset/296/diabetes+130-us-hospitals+for+years+1999-2008). A patient-encounter CSV and binary target (for example a derived 30-day readmission indicator). Choose a subgroup column such as `race` only for audit, not as an automatic care rule. Dataset files are not bundled. Respect the source terms and cite the dataset when publishing results.
-
-## Quick start
+The source contains 101,766 inpatient encounters across 130 U.S. hospitals, 1999–2008. UCI marks race, gender, and age as potentially sensitive. The source archive and row-level records are downloaded locally and are not committed.
 
 ```bash
 python -m venv .venv
 # Windows: .venv\\Scripts\\activate
 # macOS/Linux: source .venv/bin/activate
 pip install -r requirements.txt
-# Download/prepare the source data locally, then run:
-python main.py --input data/diabetic_data.csv --target readmit_30d --positive-label 1 --group race --out outputs
+python fetch_data.py
+python benchmark.py
 ```
 
-## Outputs
+The model predicts `readmitted == '<30'` versus `'>30'` or `'NO'`. A seeded 20% patient-group holdout keeps all encounters for one patient in a single partition. The split is not chronological because this source file does not provide encounter dates.
 
-The `outputs/` directory contains the model-specific results (metrics and/or ranked CSV) and a serialized estimator where applicable. Outputs are reproducible with the same input, package versions, and random seed. The repository intentionally excludes downloaded data and generated artifacts.
+## Observed result
 
-## Evaluation and operating notes
+On 20,488 held-out encounters from 14,304 distinct patients, the positive rate was 11.6%. Class-weighted logistic regression produced average precision 0.211 (prevalence baseline 0.116), ROC-AUC 0.640, and Brier score 0.228.
 
-Historical observational data with sensitive health information. This is not a clinical decision system; do not use for individual care, resource denial, or care prioritization.
+At a fixed 0.5 threshold, precision was 16.8%, recall 53.8%, and balanced accuracy 0.595, with 6,303 false positives and 1,273 true positives. Subgroup rates in `reports/benchmark.json` are descriptive: for example, race-group recall ranged from 33.3% (Asian, n=110) to 59.0% (African American, n=3,942), while false-positive rates ranged from 21.8% to 36.3%. These gaps need investigation; they do not establish a cause or a fairness guarantee.
 
-For a production review, preserve a time-based, untouched holdout; compare against a simple business baseline; inspect calibration and subgroup error; document data lineage; and monitor drift. The included baseline is not a production service.
+## Modeling choices and limits
 
-## License
+- Patient number and encounter ID are used only to split/check overlap, never as predictors.
+- Race, gender, age, weight, discharge disposition, and the target are excluded from predictors. Race and gender appear only in subgroup reporting.
+- Features include encounter-level diagnoses, utilization counts, labs, medications, and admission details. All preprocessing is fitted on training data only.
+- This historical cohort has selection criteria and missingness that limit generalization. Patient-group holdout prevents same-person leakage but does not simulate a future deployment.
+- The 0.5 threshold is not calibrated to clinical utility or resource capacity. Errors can affect patient care; do not use these outputs to make individual decisions, restrict services, or allocate care.
 
-No code license file is included yet. Third-party datasets remain subject to their original terms.
+## Source and attribution
+
+Clore, J., Cios, K., DeShazo, J., & Strack, B. (2014), [Diabetes 130-US Hospitals for Years 1999-2008, UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/296/diabetes+130-us-hospitals+for-years-1999-2008), DOI [10.24432/C5230J](https://doi.org/10.24432/C5230J). UCI lists the dataset under CC BY 4.0. This repository does not include the dataset itself.
+
