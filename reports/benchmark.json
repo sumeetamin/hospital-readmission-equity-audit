@@ -1,0 +1,149 @@
+{
+  "dataset": "UCI Diabetes 130-US Hospitals for Years 1999-2008",
+  "target": "readmitted == '<30' versus '>30' or 'NO'; encounter-level label",
+  "rows": {
+    "all_encounters": 101766,
+    "train_encounters": 81278,
+    "test_encounters": 20488,
+    "train_unique_patients": 57214,
+    "test_unique_patients": 14304,
+    "patient_overlap": 0
+  },
+  "positive_prevalence": {
+    "train": 0.11060803661507419,
+    "test": 0.11553104256149942
+  },
+  "model": "Class-weighted logistic regression with train-only imputation/scaling/one-hot encoding",
+  "features": [
+    "admission_type_id",
+    "admission_source_id",
+    "time_in_hospital",
+    "payer_code",
+    "medical_specialty",
+    "num_lab_procedures",
+    "num_procedures",
+    "num_medications",
+    "number_outpatient",
+    "number_emergency",
+    "number_inpatient",
+    "diag_1",
+    "diag_2",
+    "diag_3",
+    "number_diagnoses",
+    "max_glu_serum",
+    "A1Cresult",
+    "metformin",
+    "repaglinide",
+    "nateglinide",
+    "chlorpropamide",
+    "glimepiride",
+    "acetohexamide",
+    "glipizide",
+    "glyburide",
+    "tolbutamide",
+    "pioglitazone",
+    "rosiglitazone",
+    "acarbose",
+    "miglitol",
+    "troglitazone",
+    "tolazamide",
+    "examide",
+    "citoglipton",
+    "insulin",
+    "glyburide-metformin",
+    "glipizide-metformin",
+    "glimepiride-pioglitazone",
+    "metformin-rosiglitazone",
+    "metformin-pioglitazone",
+    "change",
+    "diabetesMed"
+  ],
+  "excluded_predictors": [
+    "age",
+    "discharge_disposition_id",
+    "encounter_id",
+    "gender",
+    "patient_nbr",
+    "race",
+    "readmitted",
+    "weight"
+  ],
+  "test_metrics_at_threshold_0_5": {
+    "average_precision": 0.21088106783965876,
+    "roc_auc": 0.640157056236084,
+    "brier_score": 0.2280789140449134,
+    "balanced_accuracy": 0.5949915447738804,
+    "precision": 0.16803062302006336,
+    "recall": 0.5378115758343895,
+    "confusion_matrix_tn_fp_fn_tp": [
+      11818,
+      6303,
+      1094,
+      1273
+    ]
+  },
+  "subgroup_audit": {
+    "race": {
+      "?": {
+        "n": 460,
+        "positive_rate": 0.07173913043478261,
+        "recall_at_0_5": 0.3939393939393939,
+        "false_positive_rate_at_0_5": 0.24355971896955503
+      },
+      "AfricanAmerican": {
+        "n": 3942,
+        "positive_rate": 0.11390157280568239,
+        "recall_at_0_5": 0.5902004454342984,
+        "false_positive_rate_at_0_5": 0.3632980246206699
+      },
+      "Asian": {
+        "n": 110,
+        "positive_rate": 0.08181818181818182,
+        "recall_at_0_5": 0.3333333333333333,
+        "false_positive_rate_at_0_5": 0.21782178217821782
+      },
+      "Caucasian": {
+        "n": 15252,
+        "positive_rate": 0.11854183057959612,
+        "recall_at_0_5": 0.5293141592920354,
+        "false_positive_rate_at_0_5": 0.3509372210651592
+      },
+      "Hispanic": {
+        "n": 412,
+        "positive_rate": 0.09951456310679611,
+        "recall_at_0_5": 0.5609756097560976,
+        "false_positive_rate_at_0_5": 0.3045822102425876
+      },
+      "Other": {
+        "n": 312,
+        "positive_rate": 0.08653846153846154,
+        "recall_at_0_5": 0.4444444444444444,
+        "false_positive_rate_at_0_5": 0.27017543859649124
+      }
+    },
+    "gender": {
+      "Female": {
+        "n": 10963,
+        "positive_rate": 0.11940162364316337,
+        "recall_at_0_5": 0.5462184873949579,
+        "false_positive_rate_at_0_5": 0.35311787859954424
+      },
+      "Male": {
+        "n": 9525,
+        "positive_rate": 0.1110761154855643,
+        "recall_at_0_5": 0.5274102079395085,
+        "false_positive_rate_at_0_5": 0.34179756702492026
+      }
+    }
+  },
+  "source_csv_sha256": "0689e7ec031237dc63031b938805c48377748761a3b26acab621567afa24df97",
+  "limitations": [
+    "Retrospective 1999-2008 data from 130 hospitals; the benchmark is historical and may not transport to current care.",
+    "GroupShuffleSplit holds out patients but is not chronological because dates are not supplied in this file.",
+    "A fixed 0.5 threshold is not calibrated to clinical benefit, capacity, or harms.",
+    "Sensitive fields and discharge disposition are excluded as predictors; race and gender are shown only for descriptive audits.",
+    "This research baseline must not be used for individual care decisions, service eligibility, or resource denial."
+  ],
+  "source_archive_sha256": "f82ac129da2ddd2299391ff6fbae3a6a58b3edcf59ac9d7bd480c00fe453112a"
+}
+
